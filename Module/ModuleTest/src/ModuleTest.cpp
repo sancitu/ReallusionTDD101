@@ -63,9 +63,5 @@ TEST( StatementsTest, Result_ByDefault_ReturnZero )
 TEST( StatementsTest, Result_OneDay_ReturnOne )
 {
     CStatements kStatements;
-    std::tm kBegin;
-    kBegin.tm_mday = 1;
-    std::tm kEnd;
-    kEnd.tm_mday = 2;
     ASSERT_EQ( kStatements.Result( "2019-01-28", "2019-01-29" ), 1 );
 }
