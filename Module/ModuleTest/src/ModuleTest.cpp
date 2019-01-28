@@ -27,14 +27,45 @@ using namespace testing;
 //   };
 //   TEST_F( TestSuiteName, TestName ) {...}
 
+#define SECONDS_OF_ONE_DAY (24*3600)
+
 class CStatements
 {
 public:
-    time_t Result() { return 0; }
+    int Result() { return 0; }
+    int Result( char* szBegin, char* szEnd )
+    {
+        std::tm kBegin = {};
+        std::istringstream ss( szBegin );
+        ss >> std::get_time( &kBegin, "%Y-%m-%d" );
+        time_t uBegin = std::mktime( &kBegin );
+
+        ss.clear();
+        ss.str( szEnd );
+
+        std::tm kEnd ={};
+        ss >> std::get_time( &kEnd, "%Y-%m-%d" );
+        time_t uEnd = std::mktime( &kEnd );
+
+        double fDiff = std::difftime( uEnd, uBegin );
+        double fDays = fDiff / SECONDS_OF_ONE_DAY;
+
+        return fDays;
+    }
 };
 
 TEST( StatementsTest, Result_ByDefault_ReturnZero )
 {
     CStatements kStatements;
     ASSERT_EQ( kStatements.Result(), 0 );
+}
+
+TEST( StatementsTest, Result_OneDay_ReturnOne )
+{
+    CStatements kStatements;
+    std::tm kBegin;
+    kBegin.tm_mday = 1;
+    std::tm kEnd;
+    kEnd.tm_mday = 2;
+    ASSERT_EQ( kStatements.Result( "2019-01-28", "2019-01-29" ), 1 );
 }
