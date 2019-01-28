@@ -26,3 +26,5 @@ using namespace testing;
 // 	      CModule	m_kModule;    // your test module
 //   };
 //   TEST_F( TestSuiteName, TestName ) {...}
+
+TEST( StatementsTest, Result_ByDefault_ReturnZero ) { ASSERT_EQ( 0, 0 ); }
