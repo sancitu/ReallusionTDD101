@@ -27,4 +27,14 @@ using namespace testing;
 //   };
 //   TEST_F( TestSuiteName, TestName ) {...}
 
-TEST( StatementsTest, Result_ByDefault_ReturnZero ) { ASSERT_EQ( 0, 0 ); }
+class CStatements
+{
+public:
+    time_t Result() { return 0; }
+};
+
+TEST( StatementsTest, Result_ByDefault_ReturnZero )
+{
+    CStatements kStatements;
+    ASSERT_EQ( kStatements.Result(), 0 );
+}
