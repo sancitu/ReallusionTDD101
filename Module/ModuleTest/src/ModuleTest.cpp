@@ -51,7 +51,7 @@ public:
         double fDiff = std::difftime( uEnd, uBegin );
         double fDays = fDiff / SECONDS_OF_ONE_DAY;
 
-        return fDays;
+        return fDays + 1;
     }
 };
 
@@ -64,5 +64,7 @@ TEST( StatementsTest, Result_ByDefault_ReturnZero )
 TEST( StatementsTest, Result_OneDay_ReturnOne )
 {
     CStatements kStatements;
-    ASSERT_EQ( kStatements.Result( "2019-01-28", "2019-01-29" ), 1 );
+    ASSERT_EQ( kStatements.Result( "2019-01-28", "2019-01-28" ), 1 );
 }
+
+
