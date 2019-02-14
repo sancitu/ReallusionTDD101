@@ -56,51 +56,64 @@ public:
 
     int Budget( char* szBegin, char* szEnd )
     {
-        std::string strBudgetBegin;
-        std::string strBudgetEnd;
-
-        auto a = g_Budget.begin()->first;
-        std::tm kBudgetBegin = {};
-        std::istringstream ss( a + "-01" ); // first day
-        ss >> std::get_time( &kBudgetBegin, "%Y-%m-%d" );
-
-        // 01 => 0101 => 0201 => 0131
-        auto b = g_Budget.rbegin()->first;
-        std::tm kBudgetEndMonthFirstDay = {};
-        std::istringstream ssb( b + "-01" ); // next to the last day
-        ssb >> std::get_time( &kBudgetEndMonthFirstDay, "%Y-%m-%d" );
-        
+        std::string strBudgetBegin = {};
+        std::string strBudgetEnd = {};
         struct tm kBudgetEnd;
-
-        struct tm kNextMonthFirstDay;
-        kNextMonthFirstDay.tm_hour = 0;
-        kNextMonthFirstDay.tm_min = 0;
-        kNextMonthFirstDay.tm_sec = 0;
-        kNextMonthFirstDay.tm_mday = 1;
-
-        if ( kBudgetEndMonthFirstDay.tm_mon == 11 )
+        
         {
-            kNextMonthFirstDay.tm_mon = 0;
-            kNextMonthFirstDay.tm_year = kBudgetEndMonthFirstDay.tm_year + 1;
-        }
-        else
-        {
-            kNextMonthFirstDay.tm_mon = kBudgetEndMonthFirstDay.tm_mon + 1;
-            kNextMonthFirstDay.tm_year = kBudgetEndMonthFirstDay.tm_year;
-        }
-        // Get the first day of the next month
-        time_t uLastday = mktime( &kNextMonthFirstDay ) - SECONDS_OF_ONE_DAY;
-        // Convert back to date and time
-        localtime_s( &kBudgetEnd, &uLastday );
+            //BudgetBegin
+            {
+                auto a = g_Budget.begin()->first;
+                std::istringstream ss( a + "-01" ); // first day
+                std::tm kBudgetBegin = {};
+                ss >> std::get_time( &kBudgetBegin, "%Y-%m-%d" );
+                std::string szYear = std::to_string( kBudgetBegin.tm_year );
+                std::string szMonth = std::to_string( kBudgetBegin.tm_mon );
+                std::string szDate = std::to_string( kBudgetBegin.tm_mday );
+                strBudgetBegin = szYear + '-' + szMonth + '-' + szDate;
+                
+            }
 
-        std::string szYear = std::to_string( kBudgetEnd.tm_year );
-        std::string szMonth = std::to_string( kBudgetEnd.tm_mon );
-        std::string szDate = std::to_string( kBudgetEnd.tm_mday );
-        strBudgetEnd = szYear + '-' + szMonth + '-' + szDate;
-        char* szBudgetEnd = &strBudgetEnd[ 0 ];
+            //BudgetEnd
+            {
+                // 01 => 0101 => 0201 => 0131
+                // 02 => 0201 => 0301 => 0228
+                auto b = g_Budget.rbegin()->first;
+                std::istringstream ssb( b + "-01" ); // next to the last day
+                std::tm kBudgetEndMonthFirstDay = {};
+                ssb >> std::get_time( &kBudgetEndMonthFirstDay, "%Y-%m-%d" );
+                
+                struct tm kNextMonthFirstDay;
+                kNextMonthFirstDay.tm_hour = 0;
+                kNextMonthFirstDay.tm_min = 0;
+                kNextMonthFirstDay.tm_sec = 0;
+                kNextMonthFirstDay.tm_mday = 1;
+                
+                if ( kBudgetEndMonthFirstDay.tm_mon == 11 )
+                {
+                    kNextMonthFirstDay.tm_mon = 0;
+                    kNextMonthFirstDay.tm_year = kBudgetEndMonthFirstDay.tm_year + 1;
+                }
+                else
+                {
+                    kNextMonthFirstDay.tm_mon = kBudgetEndMonthFirstDay.tm_mon + 1;
+                    kNextMonthFirstDay.tm_year = kBudgetEndMonthFirstDay.tm_year;
+                }
+                // Get the first day of the next month
+                time_t uLastday = mktime( &kNextMonthFirstDay ) - SECONDS_OF_ONE_DAY;
+                // Convert back to date and time
+                localtime_s( &kBudgetEnd, &uLastday );
+                
+                std::string szYear = std::to_string( kBudgetEnd.tm_year );
+                std::string szMonth = std::to_string( kBudgetEnd.tm_mon );
+                std::string szDate = std::to_string( kBudgetEnd.tm_mday );
+                strBudgetEnd = szYear + '-' + szMonth + '-' + szDate;
+            }
 
-        strBudgetBegin = b + "-01";
+        }
+        
         char* szBudgetBegin = &strBudgetBegin[ 0 ];
+        char* szBudgetEnd = &strBudgetEnd[ 0 ];
 
         if ( Result( szBudgetBegin, szBegin ) > 0 && Result( szEnd, szBudgetEnd ) > 0 )
         {
