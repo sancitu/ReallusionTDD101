@@ -53,6 +53,11 @@ public:
 
         return fDays + 1;
     }
+
+    int Budget( char* szBegin, char* szEnd ) 
+    {
+        return 10;
+    }
 };
 
 TEST( StatementsTest, Result_ByDefault_ReturnZero )
@@ -67,4 +72,8 @@ TEST( StatementsTest, Result_OneDay_ReturnOne )
     ASSERT_EQ( kStatements.Result( "2019-01-28", "2019-01-28" ), 1 );
 }
 
-
+TEST( StatementsTest, Budget_OneDay_Return10 )
+{
+    CStatements kStatements;
+    ASSERT_EQ( kStatements.Budget( "2019-01-28", "2019-01-28" ), 10 );
+}
