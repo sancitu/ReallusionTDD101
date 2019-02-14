@@ -106,6 +106,10 @@ public:
         {
             return 10 * Result( szBegin, szEnd );
         }
+        else if ( Result( szBudgetBegin, szBegin ) <= 0 && Result( szEnd, szBudgetEnd ) <= 0 )
+        {
+            return 10 * Result( szBudgetBegin, szBudgetEnd );
+        }
         else if ( Result( szEnd, szBudgetEnd ) <= 0 )
         {
             return 10 * Result( szBegin, szBudgetEnd );
@@ -155,4 +159,10 @@ TEST( StatementsTest, Budget_OutOfRangeEarly1Day_Return40 )
 {
     CStatements kStatements;
     ASSERT_EQ( kStatements.Budget( "2018-12-31", "2019-01-04" ), 40 );
+}
+
+TEST( StatementsTest, Budget_OutOfRangeEarly1DayLate1Day_Return310 )
+{
+    CStatements kStatements;
+    ASSERT_EQ( kStatements.Budget( "2018-12-31", "2019-02-01" ), 310 );
 }
