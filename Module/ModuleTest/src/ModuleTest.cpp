@@ -56,6 +56,9 @@ public:
 
     int Budget( char* szBegin, char* szEnd )
     {
+        std::string strBudgetBegin;
+        std::string strBudgetEnd;
+
         auto a = g_Budget.begin()->first;
         std::tm kBudgetBegin = {};
         std::istringstream ss( a + "-01" ); // first day
@@ -93,16 +96,27 @@ public:
         std::string szYear = std::to_string( kBudgetEnd.tm_year );
         std::string szMonth = std::to_string( kBudgetEnd.tm_mon );
         std::string szDate = std::to_string( kBudgetEnd.tm_mday );
-        std::string strBudgetEnd = szYear + '-' + szMonth + '-' + szDate;
+        strBudgetEnd = szYear + '-' + szMonth + '-' + szDate;
         char* szBudgetEnd = &strBudgetEnd[ 0 ];
 
-        if ( Result( szEnd, szBudgetEnd ) > 0 )
+        strBudgetBegin = b + "-01";
+        char* szBudgetBegin = &strBudgetBegin[ 0 ];
+
+        if ( Result( szBudgetBegin, szBegin ) > 0 && Result( szEnd, szBudgetEnd ) > 0 )
         {
             return 10 * Result( szBegin, szEnd );
         }
-        else
+        else if ( Result( szEnd, szBudgetEnd ) <= 0 )
         {
             return 10 * Result( szBegin, szBudgetEnd );
+        }
+        else if ( Result( szBudgetBegin, szBegin ) <= 0 )
+        {
+            return 10 * Result( szBudgetBegin, szEnd );
+        }
+        else
+        {
+            return 0;
         }
     }
 };
@@ -131,8 +145,14 @@ TEST( StatementsTest, Budget_TwoDays_Return20 )
     ASSERT_EQ( kStatements.Budget( "2019-01-28", "2019-01-29" ), 20 );
 }
 
-TEST( StatementsTest, Budget_FourOfFiveDays_Return40 )
+TEST( StatementsTest, Budget_OutOfRangeLate1Day_Return40 )
 {
     CStatements kStatements;
     ASSERT_EQ( kStatements.Budget( "2019-01-28", "2019-02-01" ), 40 );
+}
+
+TEST( StatementsTest, Budget_OutOfRangeEarly1Day_Return40 )
+{
+    CStatements kStatements;
+    ASSERT_EQ( kStatements.Budget( "2018-12-31", "2019-01-04" ), 40 );
 }
