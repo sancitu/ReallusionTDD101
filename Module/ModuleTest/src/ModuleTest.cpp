@@ -47,16 +47,63 @@ public:
         std::tm kEnd ={};
         ss >> std::get_time( &kEnd, "%Y-%m-%d" );
         time_t uEnd = std::mktime( &kEnd );
-
+        kEnd.tm_mday;
         double fDiff = std::difftime( uEnd, uBegin );
         double fDays = fDiff / SECONDS_OF_ONE_DAY;
 
-        return fDays + 1;
+        return (int) fDays + 1;
     }
 
-    int Budget( char* szBegin, char* szEnd ) 
+    int Budget( char* szBegin, char* szEnd )
     {
-        return 10 * Result( szBegin, szEnd );
+        auto a = g_Budget.begin()->first;
+        std::tm kBudgetBegin = {};
+        std::istringstream ss( a + "-01" ); // first day
+        ss >> std::get_time( &kBudgetBegin, "%Y-%m-%d" );
+
+        // 01 => 0101 => 0201 => 0131
+        auto b = g_Budget.rbegin()->first;
+        std::tm kBudgetEndMonthFirstDay = {};
+        std::istringstream ssb( b + "-01" ); // next to the last day
+        ssb >> std::get_time( &kBudgetEndMonthFirstDay, "%Y-%m-%d" );
+        
+        struct tm kBudgetEnd;
+
+        struct tm kNextMonthFirstDay;
+        kNextMonthFirstDay.tm_hour = 0;
+        kNextMonthFirstDay.tm_min = 0;
+        kNextMonthFirstDay.tm_sec = 0;
+        kNextMonthFirstDay.tm_mday = 1;
+
+        if ( kBudgetEndMonthFirstDay.tm_mon == 11 )
+        {
+            kNextMonthFirstDay.tm_mon = 0;
+            kNextMonthFirstDay.tm_year = kBudgetEndMonthFirstDay.tm_year + 1;
+        }
+        else
+        {
+            kNextMonthFirstDay.tm_mon = kBudgetEndMonthFirstDay.tm_mon + 1;
+            kNextMonthFirstDay.tm_year = kBudgetEndMonthFirstDay.tm_year;
+        }
+        // Get the first day of the next month
+        time_t uLastday = mktime( &kNextMonthFirstDay ) - SECONDS_OF_ONE_DAY;
+        // Convert back to date and time
+        localtime_s( &kBudgetEnd, &uLastday );
+
+        std::string szYear = std::to_string( kBudgetEnd.tm_year );
+        std::string szMonth = std::to_string( kBudgetEnd.tm_mon );
+        std::string szDate = std::to_string( kBudgetEnd.tm_mday );
+        std::string strBudgetEnd = szYear + '-' + szMonth + '-' + szDate;
+        char* szBudgetEnd = &strBudgetEnd[ 0 ];
+
+        if ( Result( szEnd, szBudgetEnd ) > 0 )
+        {
+            return 10 * Result( szBegin, szEnd );
+        }
+        else
+        {
+            return 10 * Result( szBegin, szBudgetEnd );
+        }
     }
 };
 
@@ -82,4 +129,10 @@ TEST( StatementsTest, Budget_TwoDays_Return20 )
 {
     CStatements kStatements;
     ASSERT_EQ( kStatements.Budget( "2019-01-28", "2019-01-29" ), 20 );
+}
+
+TEST( StatementsTest, Budget_FourOfFiveDays_Return40 )
+{
+    CStatements kStatements;
+    ASSERT_EQ( kStatements.Budget( "2019-01-28", "2019-02-01" ), 40 );
 }
