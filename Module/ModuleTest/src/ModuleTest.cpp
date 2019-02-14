@@ -56,7 +56,7 @@ public:
 
     int Budget( char* szBegin, char* szEnd ) 
     {
-        return 10;
+        return 10 * Result( szBegin, szEnd );
     }
 };
 
@@ -76,4 +76,10 @@ TEST( StatementsTest, Budget_OneDay_Return10 )
 {
     CStatements kStatements;
     ASSERT_EQ( kStatements.Budget( "2019-01-28", "2019-01-28" ), 10 );
+}
+
+TEST( StatementsTest, Budget_TwoDays_Return20 )
+{
+    CStatements kStatements;
+    ASSERT_EQ( kStatements.Budget( "2019-01-28", "2019-01-29" ), 20 );
 }
