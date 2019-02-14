@@ -28,6 +28,7 @@ using namespace testing;
 //   TEST_F( TestSuiteName, TestName ) {...}
 
 #define SECONDS_OF_ONE_DAY (24*3600)
+std::map<std::string, int> g_Budget { std::make_pair( "2019-01", 310 ) };
 
 class CStatements
 {
